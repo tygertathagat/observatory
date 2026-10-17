@@ -26,7 +26,7 @@ Status as of 2026-10-17. Three honest buckets.
 | Feature | What is needed |
 |---|---|
 | AC Milan fixtures (`/api/milan`) | A free key from football-data.org in `FOOTBALL_DATA_TOKEN` (server-side). Until then the panel shows an explicit "not configured" state. Cached 6 h in `.cache/milan.json`; last good data kept on failure; postponed matches flagged. |
-| Scheduled Radar refresh | The route refreshes lazily when the cache is older than the TTL. For a true schedule, call `GET /api/radar?refresh=1` once a day with header `x-refresh-token: $RADAR_REFRESH_TOKEN` from the host's scheduler (Vercel Cron, GitHub Actions, cron). |
+| Scheduled Radar refresh | `vercel.json` defines a daily cron (03:15 UTC) hitting `/api/radar?refresh=1`; set `CRON_SECRET` in the Vercel project and the route accepts Vercel's bearer header. Elsewhere, call the same URL with `x-refresh-token: $RADAR_REFRESH_TOKEN`. Note: on Vercel the disk cache in `.cache/` is per-instance and ephemeral, so a cold instance refetches; the last-good-data fallback then has nothing to serve until the first fetch succeeds. |
 | Publishing updates | Essays are read from the filesystem at build/request time. On a static host, pushing a new MDX file triggers a rebuild through the host's Git integration. On a long-running server, restart or redeploy. No webhook is required for the file-based workflow. |
 | LinkedIn API | Not implemented. The official API does not expose a member's posts for this use without a partner programme, so the supported routes are: official embeds for posts you choose, and hand-added links. Embeds show selected posts; they do not discover new ones. No scraping. |
 | `SITE_URL` | Needed for absolute links in RSS and share metadata. |
