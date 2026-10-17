@@ -1,0 +1,40 @@
+---
+title: "Why exported models disagree with the notebook"
+summary: "When a model is exported to ONNX or TensorRT and its outputs stop matching the Python pipeline, the weights are almost never the problem."
+date: 2026-10-17
+tags: [ai-systems, inference, triton]
+status: published
+sample: true
+---
+
+> **Demo essay — illustrative content.** This entry exists to show the essay layout, code highlighting and maths. It was not written by Tathagat. Delete it or replace it with your own.
+
+When a model is exported to ONNX or TensorRT and its outputs stop matching the Python pipeline, the weights are almost never the problem. The preprocessing is.
+
+Resize interpolation, channel order, normalisation constants and letterboxing all have defaults that differ between libraries. Each one changes the input tensor slightly, and small input differences become large output differences in a detector.
+
+## Diff the tensors first
+
+The fix is boring and reliable: dump the input tensor from both paths for the same image and compare them before comparing any predictions.
+
+```python
+import numpy as np
+
+a = np.load("legacy_input.npy")      # from the Python pipeline
+b = np.load("triton_input.npy")      # from the Triton client
+
+print("max abs diff:", np.abs(a - b).max())
+print("mean abs diff:", np.abs(a - b).mean())
+```
+
+If the maximum absolute difference is above roughly $10^{-3}$ for a normalised image tensor, stop and look at preprocessing. Comparing bounding boxes at that point only tells you *that* something is wrong, not *where*.
+
+## Why small input errors grow
+
+For a detector with confidence threshold $\tau$, a box survives when $\sigma(z) > \tau$. Near the threshold, a tiny change in the logit $z$ flips the decision:
+
+$$
+\frac{\partial \sigma}{\partial z} = \sigma(z)\,(1 - \sigma(z))
+$$
+
+which is largest exactly where $\sigma(z) \approx 0.5$, the region where most borderline detections live.

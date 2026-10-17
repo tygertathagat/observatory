@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# server-side caches (radar, fixtures)
+.cache/
+
+# keep the example env file
+!.env.example
