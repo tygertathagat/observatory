@@ -1,5 +1,7 @@
 # Tathagat — the Himalayan Observatory
 
+Live: https://observatory-seven-tan.vercel.app · Source: https://github.com/tygertathagat/observatory
+
 A personal portfolio built as an explorable illustrated place: blue hour outside a stone-and-timber observatory, then a warm study under the dome. Objects in the study open the real content: the workstation (case studies), notebook (field journal), telescope (learning map), bookshelf (about), tactics board and controller (the personal corner: football, gaming, fantasy), the window (a moment of calm) and the letter (contact). Everything is also reachable from the persistent menu and from direct URLs.
 
 ## Run it
@@ -25,6 +27,10 @@ Open http://localhost:3000. Production build: `npm run build && npm start`. Copy
 ## URLs
 
 `/#work`, `/#work/<slug>`, `/#signal`, `/#signal/linkedin`, `/#signal/radar`, `/#bench/batching`, `/#bench/gearbox`, `/#exploring/<topic>`, `/#about`, `/#about/now`, `/#offclock`, `/#offclock/milan`, `/#beyond`, `/#contact`, plus `/essays/<slug>` and `/feed.xml`. Opening one of these lands straight inside with the panel open; browser back/forward close and reopen panels.
+
+## Hosting
+
+Deployed on Vercel from the `main` branch of the GitHub repo; every push redeploys. Production environment variables: `SITE_URL`, `CRON_SECRET` and `RADAR_REFRESH_TOKEN` are set; `FOOTBALL_DATA_TOKEN` is not (add it in the Vercel project to enable the AC Milan matchday card). `vercel.json` schedules the daily Reading Radar refresh.
 
 ## Design notes
 
