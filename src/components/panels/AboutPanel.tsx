@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { profile, experience, education, expertise, now } from "@/content/site";
 
 const Bullet = ({ t }: { t: string }) => (
@@ -12,7 +13,7 @@ const Bullet = ({ t }: { t: string }) => (
 
 const fmt = (iso: string) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
-export function AboutPanel({ slug }: { slug: string | null }) {
+export function AboutPanel({ slug, portrait }: { slug: string | null; portrait: string | null }) {
   useEffect(() => {
     if (!slug) return;
     const t = setTimeout(() => document.getElementById(`about-${slug}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 450);
@@ -32,6 +33,13 @@ export function AboutPanel({ slug }: { slug: string | null }) {
           ))}
         </div>
         <div className="rounded-2xl border border-line bg-elevated p-6 text-sm">
+          {portrait ? (
+            <Image src={portrait} alt={`${profile.name}, portrait`} width={600} height={750} className="mb-6 aspect-[4/5] w-full rounded-xl object-cover" priority />
+          ) : (
+            <div className="mb-6 flex aspect-[4/5] w-full items-center justify-center rounded-xl border border-dashed border-line font-mono text-[10px] uppercase tracking-wider text-muted">
+              portrait · public/me
+            </div>
+          )}
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">Now</p>
           <p className="mt-2">{profile.currentTitle} at <span className="font-medium">{profile.currentCompany}</span></p>
           <p className="mt-4 font-mono text-xs uppercase tracking-[0.2em] text-accent">Based</p>

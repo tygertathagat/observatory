@@ -32,6 +32,7 @@ export function Panel({
   onNavigate,
   beyondPhotos,
   essays,
+  portrait,
 }: {
   view: View | null;
   slug: string | null;
@@ -39,6 +40,7 @@ export function Panel({
   onNavigate: (v: View, slug?: string | null) => void;
   beyondPhotos: string[];
   essays: EssayMeta[];
+  portrait: string | null;
 }) {
   const closeBtn = useRef<HTMLButtonElement>(null);
   const body = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export function Panel({
               {view === "signal" && <SignalPanel slug={slug} onNavigate={onNavigate} essays={essays} />}
               {view === "bench" && <BenchPanel slug={slug} onNavigate={onNavigate} />}
               {view === "exploring" && <ExploringPanel slug={slug} onNavigate={onNavigate} />}
-              {view === "about" && <AboutPanel slug={slug} />}
+              {view === "about" && <AboutPanel slug={slug} portrait={portrait} />}
               {view === "offclock" && <OffClockPanel slug={slug} />}
               {view === "beyond" && <BeyondPanel photos={beyondPhotos} />}
               {view === "contact" && <ContactPanel />}

@@ -14,7 +14,7 @@ import type { EssayMeta } from "@/lib/essays";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function Room({ beyondPhotos, essays }: { beyondPhotos: string[]; essays: EssayMeta[] }) {
+export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: string[]; essays: EssayMeta[]; portraitSrc: string | null }) {
   const { route, go } = useRoute();
   const [insideState, setInside] = useState(false);
   // a direct URL to a section lands inside with that panel open
@@ -254,7 +254,7 @@ export function Room({ beyondPhotos, essays }: { beyondPhotos: string[]; essays:
         </div>
       )}
 
-      <Panel view={route.view} slug={route.slug} onClose={close} onNavigate={open} beyondPhotos={beyondPhotos} essays={essays} />
+      <Panel view={route.view} slug={route.slug} onClose={close} onNavigate={open} beyondPhotos={beyondPhotos} essays={essays} portrait={portraitSrc} />
     </div>
   );
 }

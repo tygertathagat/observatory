@@ -17,13 +17,23 @@ function beyondPhotos(): string[] {
   }
 }
 
+/** Drop one portrait into public/me/ and it appears in About. */
+function portrait(): string | null {
+  try {
+    const f = readdirSync(join(process.cwd(), "public", "me")).filter((x) => /\.(jpe?g|png|webp|avif)$/i.test(x)).sort()[0];
+    return f ? `/me/${f}` : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Home() {
   const photos = beyondPhotos();
   const essays = listEssays();
   return (
     <main>
       <Cursor />
-      <Room beyondPhotos={photos} essays={essays} />
+      <Room beyondPhotos={photos} essays={essays} portraitSrc={portrait()} />
       {/* Semantic, crawlable copy of the content. Hidden visually when the scene runs; shown if JavaScript is unavailable. */}
       <Fallback photos={photos} essays={essays} />
     </main>
