@@ -13,6 +13,6 @@ Everything below is either missing or marked as a draft in `src/content/site.ts`
 6a. **A portrait**: drop one image into `public/me/` (JPG/PNG/WebP, about 4:5). It appears in About.
 6. **Photographs for "A moment of calm"** (the window): drop JPG/PNG/WebP files into `public/beyond/` and add honest captions in `beyond.captions` keyed by filename.
 7. **Confirm wording** of the bio and the statement in `profile` so it sounds like you.
-8. **Open Graph image**: add `public/opengraph-image.png` (1200×630) when you have one; metadata is already wired for title and description.
+8. **Open Graph image**: `src/app/opengraph-image.jpg` is your snow-peak photo; swap it any time.
 
 Nothing on the site names the clinical product (NDA). Your phone number and exact address are deliberately not published.

@@ -17,7 +17,7 @@ export const profile = {
     "I build intelligent systems and like understanding exactly how, and why, they work.",
   thread: "What's happening underneath?",
   bio: [
-    "I'm an AI/ML solution architect with a master's in Data Science and AI. My work is production AI: computer-vision inference, LLM serving and applications, and the backend architecture that holds them together.",
+    "I'm an AI engineer with a master's in Data Science and AI. My work is production AI: computer-vision inference, LLM serving and applications, and the backend architecture that holds them together.",
     "I care about the layer underneath the frameworks. Right now that means GPU computing and distributed training: CUDA, DDP and FSDP, NCCL, profiling. I study these because the systems I ship are only as good as my understanding of what they run on.",
     "Outside work I'm a nerd with a football habit: I play, I watch, I argue about formations. I game (Valorant, EA Sports FC), I read fantasy, and I build physical things when the problem is interesting enough. I live in the Himalayan region of India, with an apple orchard that is my quiet place rather than my job.",
   ],
@@ -404,8 +404,19 @@ export const beyond = {
     "The window faces the ridgelines. Most evenings that is all it needs to do.",
     "I live in the Himalayan region of India. There is an apple orchard out there too, which is my quiet place, not my job. This page is a short pause before you go back to the desk.",
   ],
-  /** Drop photos into public/beyond/ and add honest captions here, keyed by filename. */
-  captions: {} as Record<string, string>,
+  /** Drop photos into public/beyond/ and add honest captions here, keyed by filename.
+   *  TODO: Tathagat to add place names if he wants them; these describe only what is visible. */
+  captions: {
+    "dsc03398.jpg": "A road cut through the gorge.",
+    "dsc03487.jpg": "A monastery under bare ridgelines.",
+    "dsc03529.jpg": "Somewhere up a valley, with the car.",
+    "dsc03657.jpg": "A café window covered in riders' stickers.",
+    "dsc03731.jpg": "Looking down over an eroded riverbed.",
+    "dsc03846.jpg": "A high lake, snow on the far peaks.",
+    "dsc03941.jpg": "Snow peaks above an autumn plateau.",
+    "dsc03942.jpg": "The same peaks, wider.",
+    "dsc04053.jpg": "Above a village and its poplars.",
+  } as Record<string, string>,
   note: "Photographs on this page are Tathagat's own. No stock or generated imagery is presented as his property.",
 };
 
