@@ -2,7 +2,7 @@
 
 Everything below is either missing or marked as a draft in `src/content/site.ts`. Search the file for `TODO` and `unverified`.
 
-1. **Public resume PDF** → put the file in `public/` and set `links.resume`.
+1. **Resume PDF**: `public/Tathagat-CV.pdf` is generated from `docs/cv/Tathagat_CV_web.docx` (no phone number). Re-export when you update the CV; the full copy is `docs/cv/Tathagat_CV_2026-10.docx`.
 2. **Personal corner** (`personal` in `site.ts`): favourite club, player and the position you play (`football`), platform (`gaming`), favourite books or authors (`fantasy`). Each field is shown only when filled; nothing is invented meanwhile.
 3. **Football tactics board**: change `personal.football.defaultFormation` if 4-3-3 isn't your default.
 4. **Essays**: the two files in `content/essays/` marked `sample: true` are layout placeholders. Replace them with your own writing or delete them. Set `status: published` when ready.

@@ -29,7 +29,7 @@ export const links = {
   linkedin: "https://www.linkedin.com/in/tathagat3/",
   instagram: "https://www.instagram.com/__the__white__wolf/",
   github: "https://github.com/tygertathagat",
-  resume: "", // TODO: public resume PDF path, e.g. /Tathagat-CV.pdf
+  resume: "/Tathagat-CV.pdf", // web copy without the phone number; source in docs/cv/
 };
 
 /* ------------------------------------------------------------------ */
