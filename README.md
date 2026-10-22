@@ -1,6 +1,6 @@
 # Tathagat — the Himalayan Observatory
 
-Live: https://observatory-seven-tan.vercel.app · Source: https://github.com/tygertathagat/observatory
+Live: https://tathagat.xyz (also observatory-seven-tan.vercel.app) · Source: https://github.com/tygertathagat/observatory
 
 A personal portfolio built as an explorable illustrated place: blue hour outside a stone-and-timber observatory, then a warm study under the dome. Objects in the study open the real content: the workstation (case studies), notebook (field journal), telescope (learning map), bookshelf (about), tactics board and controller (the personal corner: football, gaming, fantasy), the window (a moment of calm) and the letter (contact). Everything is also reachable from the persistent menu and from direct URLs.
 

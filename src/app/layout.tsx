@@ -16,6 +16,7 @@ const title = `${profile.name} · ${profile.role}`;
 const description = `${profile.intro} ${profile.statement}`;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL ?? "https://tathagat.xyz"),
   title,
   description,
   openGraph: { title, description, type: "website", siteName: `${profile.name}'s observatory` },
