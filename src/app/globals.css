@@ -176,9 +176,13 @@ html.js .fallback {
 .hotspot:focus-visible > *:first-child {
   filter: drop-shadow(0 0 10px rgba(232, 179, 107, 0.55)) brightness(1.12);
 }
+.hotspot {
+  --near: 0;
+}
 .hotlabel {
-  opacity: 0;
-  transition: opacity 0.25s ease;
+  /* always present: dim at rest, brighter as the pointer approaches */
+  opacity: calc(0.28 + 0.72 * var(--near));
+  transition: opacity 0.15s ease;
   pointer-events: none;
 }
 .hotlabel rect {
@@ -195,6 +199,10 @@ html.js .fallback {
 .hotspot:focus-visible .hotlabel,
 .room[data-hints="1"] .hotlabel {
   opacity: 1;
+}
+.hotspot[data-on="1"] .hotlabel rect,
+.hotspot:focus-visible .hotlabel rect {
+  stroke: rgba(232, 179, 107, 0.95);
 }
 .screen .codeline,
 .screen .cursorblink {

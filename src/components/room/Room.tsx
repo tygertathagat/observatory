@@ -85,6 +85,43 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
     };
   }, [reduce, inside]);
 
+  // labels are always visible; they brighten as the pointer approaches each object
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || !inside || portrait) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    let raf = 0;
+    let last: PointerEvent | null = null;
+    const apply = () => {
+      raf = 0;
+      const svg = el.querySelector<SVGSVGElement>("svg.scene");
+      if (!svg || !last) return;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      const p = new DOMPoint(last.clientX, last.clientY).matrixTransform(ctm.inverse());
+      el.querySelectorAll<SVGGElement>("[data-hot]").forEach((h) => {
+        const lx = Number(h.dataset.lx), ly = Number(h.dataset.ly);
+        const d = Math.hypot(p.x - lx - 60, p.y - ly + 30); // measure from roughly the object's centre
+        const near = Math.max(0, Math.min(1, 1 - (d - 90) / 420));
+        h.style.setProperty("--near", (near * near).toFixed(3));
+      });
+    };
+    const onMove = (e: PointerEvent) => {
+      last = e;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const onLeave = () => {
+      el.querySelectorAll<SVGGElement>("[data-hot]").forEach((h) => h.style.setProperty("--near", "0"));
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerleave", onLeave);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerleave", onLeave);
+    };
+  }, [inside, portrait]);
+
   const enter = useCallback(() => {
     setLeaving(true);
     window.setTimeout(() => setLeaving(false), 700);

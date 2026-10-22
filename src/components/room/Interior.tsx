@@ -59,6 +59,8 @@ export function Interior({
         aria-label={label}
         className="hotspot"
         data-hot={id}
+        data-lx={lx}
+        data-ly={ly}
         data-on={hovered === id ? "1" : "0"}
         onPointerEnter={() => setHovered(id)}
         onPointerLeave={() => setHovered(null)}
