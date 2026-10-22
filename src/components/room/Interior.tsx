@@ -82,7 +82,7 @@ export function Interior({
   };
 
   return (
-    <svg viewBox={portrait ? "420 200 860 620" : "0 0 1600 900"} preserveAspectRatio="xMidYMid slice" className="scene absolute inset-0 h-full w-full select-none">
+    <svg viewBox={portrait ? "60 90 1480 720" : "0 0 1600 900"} preserveAspectRatio={portrait ? "xMidYMid meet" : "xMidYMid slice"} className="scene absolute inset-0 h-full w-full select-none">
       <defs>
         <linearGradient id="isky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#0b1324" />

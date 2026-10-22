@@ -298,3 +298,8 @@ html.js .fallback {
     display: block;
   }
 }
+
+/* phone postcard: objects stay tappable but labels would clutter the small picture */
+.room[data-portrait="1"] .hotlabel {
+  display: none;
+}

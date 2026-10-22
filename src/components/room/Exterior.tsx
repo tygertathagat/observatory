@@ -4,9 +4,15 @@
  * Blue hour outside the observatory. Pure SVG, so it paints on first frame.
  * Layers carry data-depth for a gentle parallax handled by Room.tsx.
  */
-export function Exterior({ lit, portrait = false }: { lit: boolean; portrait?: boolean }) {
+/**
+ * framing: "wide" fills widescreen displays; "mid" (laptops, squarer windows) anchors to the right so the
+ * observatory stays in frame while the sky is cropped on the left; "portrait" is a tighter phone crop.
+ */
+export function Exterior({ lit, framing = "wide" }: { lit: boolean; framing?: "wide" | "mid" | "portrait" }) {
+  const viewBox = framing === "portrait" ? "760 60 840 840" : "0 0 1600 900";
+  const fit = framing === "mid" ? "xMaxYMid slice" : "xMidYMid slice";
   return (
-    <svg viewBox={portrait ? "760 60 840 840" : "0 0 1600 900"} preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full select-none" aria-hidden>
+    <svg viewBox={viewBox} preserveAspectRatio={fit} className="absolute inset-0 h-full w-full select-none" aria-hidden>
       <defs>
         <linearGradient id="xsky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#0b1324" />

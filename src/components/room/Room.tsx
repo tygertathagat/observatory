@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Exterior } from "./Exterior";
 import { Interior, HOTSPOT_LABELS, type HotspotId } from "./Interior";
-import { Menu, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Panel } from "./Panel";
 import { RoomMenu } from "./RoomMenu";
 import { Ambience } from "./Ambience";
@@ -23,7 +23,7 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
   const [hintsOn, setHintsOn] = useState(false);
   const [reduce, setReduce] = useState(false);
   const [portrait, setPortrait] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
+  const [mid, setMid] = useState(false); // laptop-ish aspect ratios
   const [leaving, setLeaving] = useState(false); // opening frame fading out
   const navToggle = useRef<HTMLButtonElement>(null);
   const prevView = useRef<View | null>(null);
@@ -33,16 +33,20 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pq = window.matchMedia("(max-width: 767px)");
+    const aq = window.matchMedia("(min-width: 768px) and (max-aspect-ratio: 17/10)");
     const sync = () => {
       setReduce(mq.matches);
       setPortrait(pq.matches);
+      setMid(aq.matches);
     };
     sync();
     mq.addEventListener("change", sync);
     pq.addEventListener("change", sync);
+    aq.addEventListener("change", sync);
     return () => {
       mq.removeEventListener("change", sync);
       pq.removeEventListener("change", sync);
+      aq.removeEventListener("change", sync);
     };
   }, []);
 
@@ -96,7 +100,6 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
       const active = document.activeElement as HTMLElement | null;
       // remember the control that opened the panel (not the body, not the panel itself)
       if (active && active !== document.body && !active.closest(".panel")) lastTrigger.current = active;
-      setNavOpen(false);
       go(v, slug);
     },
     [go]
@@ -146,8 +149,8 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
   }, [route.view, close]);
 
   return (
-    <div className="room fixed inset-0 overflow-hidden bg-[#0a0d16]" data-hints={hintsOn ? "1" : "0"}>
-      <div ref={stage} className="absolute inset-0">
+    <div className="room fixed inset-0 overflow-hidden bg-[#0a0d16]" data-hints={hintsOn ? "1" : "0"} data-portrait={portrait ? "1" : "0"}>
+      <div ref={stage} className={portrait && inside ? "absolute inset-0 overflow-y-auto overscroll-contain" : "absolute inset-0"}>
         <AnimatePresence initial={false}>
           {!inside ? (
             <motion.div
@@ -158,17 +161,45 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
               exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.35, transition: { duration: 1.1, ease } }}
               transition={{ duration: 0.6 }}
             >
-              <Exterior lit portrait={portrait} />
+              <Exterior lit framing={portrait ? "portrait" : mid ? "mid" : "wide"} />
             </motion.div>
           ) : (
             <motion.div
               key="inside"
-              className="absolute inset-0"
+              className={portrait ? "relative" : "absolute inset-0"}
               initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.08 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: reduce ? 0.3 : 1.2, ease }}
             >
-              <Interior onOpen={(v, slug) => open(v, slug)} hovered={hovered} setHovered={setHovered} awake={inside} portrait={portrait} />
+              {portrait ? (
+                <>
+                  {/* phones: the whole study as a postcard, then large destinations below. No cropping, no tiny targets. */}
+                  <div className="relative mt-16 aspect-[1480/720] w-full">
+                    <Interior onOpen={(v, slug) => open(v, slug)} hovered={hovered} setHovered={setHovered} awake={inside} portrait />
+                  </div>
+                  <nav aria-label="Places in the study" className="px-4 pb-10 pt-5">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#e8b36b]">Where to?</p>
+                    <ul className="mt-3 grid grid-cols-2 gap-2">
+                      {VIEWS.map((v) => {
+                        const [obj, label] = HOTSPOT_LABELS[v].split(" · ");
+                        return (
+                          <li key={v}>
+                            <button type="button" data-nav={v} onClick={() => open(v)} className="flex min-h-[72px] w-full items-center justify-between gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left backdrop-blur-md transition active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e8b36b]">
+                              <span>
+                                <span className="block text-[15px] leading-tight text-[#f2ede4]">{label ?? obj}</span>
+                                {label && <span className="mt-1 block font-mono text-[10px] uppercase tracking-wider text-[#e8dcc6]/60">{obj}</span>}
+                              </span>
+                              <ArrowRight size={16} className="shrink-0 text-[#e8b36b]" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
+                </>
+              ) : (
+                <Interior onOpen={(v, slug) => open(v, slug)} hovered={hovered} setHovered={setHovered} awake={inside} />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -215,44 +246,6 @@ export function Room({ beyondPhotos, essays, portraitSrc }: { beyondPhotos: stri
 
       <RoomMenu active={route.view} onOpen={(v, s) => open(v, s)} visible={inside} onHome={() => { go(null); setInside(false); }} essays={essays} />
       <Ambience visible={inside} />
-
-      {/* phones: a labelled navigation toggle and large targets for every destination */}
-      {inside && (
-        <div className="absolute inset-x-0 bottom-0 z-30 md:hidden">
-          <AnimatePresence>
-            {navOpen && (
-              <motion.nav
-                id="mobile-nav"
-                aria-label="Places in the study"
-                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                transition={{ duration: reduce ? 0 : 0.2 }}
-                className="mx-3 mb-2 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-black/70 p-2 backdrop-blur-md"
-              >
-                {VIEWS.map((v) => (
-                  <button key={v} type="button" data-nav={v} onClick={() => open(v)} className="min-h-11 rounded-xl px-3 py-2 text-left text-sm text-[#e8dcc6] transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e8b36b]">
-                    {HOTSPOT_LABELS[v].split(" · ")[1]}
-                  </button>
-                ))}
-              </motion.nav>
-            )}
-          </AnimatePresence>
-          <div className="flex justify-center pb-4">
-            <button
-              ref={navToggle}
-              type="button"
-              aria-expanded={navOpen}
-              aria-controls="mobile-nav"
-              aria-label={navOpen ? "Close navigation" : "Open navigation"}
-              onClick={() => setNavOpen((o) => !o)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-black/60 px-5 text-sm text-[#e8dcc6] backdrop-blur-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e8b36b]"
-            >
-              {navOpen ? <X size={16} /> : <Menu size={16} />} {navOpen ? "Close" : "Places"}
-            </button>
-          </div>
-        </div>
-      )}
 
       <Panel view={route.view} slug={route.slug} onClose={close} onNavigate={open} beyondPhotos={beyondPhotos} essays={essays} portrait={portraitSrc} />
     </div>
