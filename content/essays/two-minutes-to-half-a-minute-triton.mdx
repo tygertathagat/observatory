@@ -1,0 +1,94 @@
+---
+title: "Two minutes to half a minute: moving vision inference onto Triton"
+summary: "How a multi-model inference pipeline went from a queue on one GPU to a batched request on NVIDIA Triton, measured against the old stack on the same images, without changing a single answer."
+date: 2026-10-29
+tags: [ai-systems, inference, triton, tensorrt]
+status: published
+---
+
+Every request starts the same way: five images go in, and five analysis pipelines run on them. Each pipeline needs its own set of computer-vision models, and together they share one GPU.
+
+For a long time, that meant a queue. Each pipeline's call arrived at the same time and they all fought over the same hardware. The slowest one set the pace, and the user sat through it.
+
+Running all the conditions together used to take upwards of **1.5 minutes**. A single PTSD analysis took about **27 seconds**. From clicking "Analyze" to seeing results, one real run took **2 minutes 14 seconds**.
+
+## Making the models fit the GPU
+
+The first step was getting every model out of the application process and onto a proper inference server.
+
+**Convert.** Every model was exported to ONNX and checked against its original. The outputs had to match before the next step started. On the GPU, the largest difference in raw detector output was about 0.03%.
+
+**Serve.** All GPU work moved to NVIDIA Triton Inference Server. The application now does only the image preprocessing and result assembly. Triton handles scheduling, batching, and GPU memory. Cheap CPU-only steps stayed where they were, because moving them would have shifted coordinates that downstream thresholds depend on.
+
+**Compile.** Each detector was compiled to a TensorRT FP16 engine, built on the same GPU type used in production. Some models stayed on ONNX Runtime, where TensorRT handled their operations poorly.
+
+**Batch.** The big change: five separate calls became one. The shared work, such as face detection and landmarks, runs once, and the results fan out to all five pipelines.
+
+## The numbers
+
+Same five test images, same server, five measured rounds per setup after a warm-up round.
+
+**At camera resolution (1280 px, about 200 KB per image):**
+
+| Setup | Median | Range |
+|---|---|---|
+| Original stack, five parallel calls | 12.0 s | 9.6 – 13.5 s |
+| Triton + TensorRT, same five calls | 5.2 s | 5.19 – 5.22 s |
+| Triton + TensorRT, one batched call | **3.1 s** | 3.08 – 3.10 s |
+
+**At full resolution (up to 24 MP, 1.4–5 MB per image):**
+
+| Setup | Median | Range |
+|---|---|---|
+| Original stack, five parallel calls | 23.7 s | 20.4 – 27.9 s |
+| Triton + TensorRT, same five calls | 23.3 s | 23.2 – 23.5 s |
+| Triton + TensorRT, one batched call | **11.1 s** | 11.04 – 11.12 s |
+
+Three things stand out:
+
+1. **At camera resolution, the speedup splits in two.** Moving to Triton and TensorRT gives about 2.3x. Batching the calls gives about another 1.7x on top.
+2. **At full resolution, decoding the huge images is most of the work.** Triton alone barely moves the needle, but batching still halves the time, because the decoding happens once instead of five times.
+3. **The jitter nearly disappeared.** The original stack's runs spread over several seconds. Triton's spread is under 0.1 s.
+
+## What the user felt
+
+We also ran one real analysis on each version, from clicking "Analyze" to the results page:
+
+| Step | Before | After |
+|---|---|---|
+| Upload and start | 5.0 s | 7.1 s |
+| Inference, all five pipelines | — | 11.4 s, batched |
+| Report generation | 7.8 s | 7.0 s |
+| **Click to results** | **134 s** | **27 s** |
+
+Inference itself isn't the whole story. Once inference became predictable, the app could show the user what was actually happening in real time, instead of making them wait out a timer built for the worst case.
+
+## Same answers, faster
+
+A faster wrong answer is worse than a slow right one, so every step had to show that the outputs did not change:
+
+- Each TensorRT engine was compared with its ONNX version on rectangular, square, and batch-of-two inputs: **box IoU ≥ 0.998, confidence difference ≤ 0.0007**.
+- All five full pipelines produced **the same decisions and scores** as before on the test fixtures.
+- When one detector was upgraded, the old and new servers ran side by side on the same inputs. **Exactly one output changed**, and it was the miss the upgrade was meant to fix.
+
+## Making it safe to ship
+
+- **Hash-verified releases.** Every source and model file is checked against a manifest before the service starts.
+- **Fail-closed startup.** The API refuses to start if the inference server is missing a model or a required secret.
+- **Local-only inference.** The inference server listens only on localhost.
+- **One-step rollback.** Every cutover kept a backup and the previous containers, and the batched path sits behind a single flag.
+
+## Lessons
+
+1. **Measure the whole request, not just the model.** Batching and predictable timing mattered more to the user than the faster engines did.
+2. **Watch the variance, not only the median.** Steady latency is what lets you stop padding the wait for the worst case.
+3. **Test at real image sizes.** At 24 MP, preprocessing dominated, and the GPU barely mattered.
+4. **Use parity as the gate.** Each phase shipped only when the outputs matched.
+
+## What's next
+
+Load testing to tune batching for many users at once, resizing images before inference (the full-resolution numbers show that's the next big lever), and rolling the batched path and live progress out to every environment.
+
+---
+
+*Measurements were taken on 29 October 2026. Server-side timings used the same five-image test set on the original and new stacks, with one warm-up round and five measured rounds per setup. The end-to-end run was a single analysis on each version, timed from the browser. Timings are single-user, not a throughput benchmark.*
