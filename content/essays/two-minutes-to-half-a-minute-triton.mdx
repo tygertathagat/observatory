@@ -10,7 +10,7 @@ Every request starts the same way: five images go in, and five analysis pipeline
 
 For a long time, that meant a queue. Each pipeline's call arrived at the same time and they all fought over the same hardware. The slowest one set the pace, and the user sat through it.
 
-Running all the conditions together used to take upwards of **1.5 minutes**. A single PTSD analysis took about **27 seconds**. From clicking "Analyze" to seeing results, one real run took **2 minutes 14 seconds**.
+Running all five pipelines together used to take upwards of **1.5 minutes**. A single pipeline on its own took about **27 seconds**. From submitting the images to seeing results, one real run took **2 minutes 14 seconds**.
 
 ## Making the models fit the GPU
 
@@ -52,7 +52,7 @@ Three things stand out:
 
 ## What the user felt
 
-We also ran one real analysis on each version, from clicking "Analyze" to the results page:
+We also ran one real request on each version, from submitting the images to the results page:
 
 | Step | Before | After |
 |---|---|---|
@@ -91,4 +91,4 @@ Load testing to tune batching for many users at once, resizing images before inf
 
 ---
 
-*Measurements were taken on 29 October 2026. Server-side timings used the same five-image test set on the original and new stacks, with one warm-up round and five measured rounds per setup. The end-to-end run was a single analysis on each version, timed from the browser. Timings are single-user, not a throughput benchmark.*
+*Measurements were taken on 29 October 2026. Server-side timings used the same five-image test set on the original and new stacks, with one warm-up round and five measured rounds per setup. The end-to-end run was a single request on each version, timed from the browser. Timings are single-user, not a throughput benchmark.*
