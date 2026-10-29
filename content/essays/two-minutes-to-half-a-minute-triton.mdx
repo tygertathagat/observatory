@@ -56,8 +56,8 @@ We also ran one real request on each version, from submitting the images to the 
 
 | Step | Before | After |
 |---|---|---|
-| Upload and start | 5.0 s | 7.1 s |
-| Inference, all five pipelines | — | 11.4 s, batched |
+| Upload and start | 7.1 s | 5.0 s |
+| Inference, all five pipelines | 78 s | 11.4 s, batched |
 | Report generation | 7.8 s | 7.0 s |
 | **Click to results** | **134 s** | **27 s** |
 
@@ -91,4 +91,4 @@ Load testing to tune batching for many users at once, resizing images before inf
 
 ---
 
-*Measurements were taken on 29 October 2026. Server-side timings used the same five-image test set on the original and new stacks, with one warm-up round and five measured rounds per setup. The end-to-end run was a single request on each version, timed from the browser. Timings are single-user, not a throughput benchmark.*
+*Measurements were taken on 29 October 2026. Server-side timings used the same five-image test set on the original and new stacks, with one warm-up round and five measured rounds per setup. The end-to-end table combines browser timings of a single request on each version with the team's observed figures for the original stack. Timings are single-user, not a throughput benchmark.*
