@@ -9,15 +9,15 @@ const DIAGRAMS: Record<string, { title: string; nodes: Node[]; edges: Edge[] }> 
   inference: {
     title: "Concurrent multi-model inference behind Triton",
     nodes: [
-      { id: "client", label: "App / clinic", x: 60, y: 150, note: "Consumer app or B2B clinic staff submit images through the API.", kind: "edge" },
+      { id: "client", label: "Client apps", x: 60, y: 150, note: "Client applications submit images through the API.", kind: "edge" },
       { id: "alb", label: "ALB", x: 220, y: 150, note: "AWS Application Load Balancer in front of several Uvicorn workers.", kind: "edge" },
       { id: "api", label: "FastAPI", x: 370, y: 150, w: 110, note: "Stateless API: auth, rate limiting, tenancy, audit logs. Fans out inference with asyncio.gather." },
-      { id: "yolo", label: "YOLO", x: 580, y: 60, note: "Face and landmark detection.", kind: "gpu" },
+      { id: "yolo", label: "YOLO", x: 580, y: 60, note: "Detection and landmark models.", kind: "gpu" },
       { id: "eff", label: "EfficientNet", x: 580, y: 150, w: 120, note: "Feature classification.", kind: "gpu" },
       { id: "vlm", label: "Vision LLM", x: 580, y: 240, w: 110, note: "Multimodal reasoning and structured report text.", kind: "gpu" },
       { id: "triton", label: "Triton", x: 760, y: 105, note: "GPU inference server; ONNX / TensorRT exports validated against the legacy pipeline.", kind: "gpu" },
       { id: "db", label: "Aurora", x: 370, y: 270, note: "Async PostgreSQL via SQLAlchemy + asyncpg.", kind: "store" },
-      { id: "s3", label: "S3", x: 220, y: 270, note: "PHI-aware image storage with scoped access.", kind: "store" },
+      { id: "s3", label: "S3", x: 220, y: 270, note: "Image storage with scoped access.", kind: "store" },
     ],
     edges: [["client", "alb"], ["alb", "api"], ["api", "yolo", "async"], ["api", "eff", "async"], ["api", "vlm", "async"], ["yolo", "triton"], ["eff", "triton"], ["api", "db"], ["api", "s3"]],
   },

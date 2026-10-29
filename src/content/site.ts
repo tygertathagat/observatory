@@ -66,18 +66,18 @@ export const projects: CaseStudy[] = [
   {
     slug: "cv-inference-triton",
     title: "Production computer-vision inference on Triton",
-    kicker: "Clinical screening platform",
-    context: "Vigyanam Labs · product under NDA",
+    kicker: "Computer-vision platform",
+    context: "Production system · details under NDA",
     period: "2025 — present",
     status: "shipped",
     confidential: true,
     problem:
-      "A facial-analysis screening product needed to run several vision models and a multimodal LLM on every submission, with throughput and reliability good enough for both a consumer app and a multi-tenant clinical B2B product. The product itself is under NDA, so this study describes the engineering, not the product.",
+      "A production product needed to run several vision models and a multimodal LLM on every submission, with throughput and reliability good enough for a multi-tenant platform. The product itself is under NDA, so this study describes the engineering, not the product.",
     role:
       "Designed and built the platform from an empty repository: models, serving layer, API, multi-tenancy and cloud deployment. Led a small team through production hardening.",
     constraints: [
       "GPU-heavy inference had to be separated from core API handling so the API stayed responsive under load.",
-      "PHI-aware storage and access control: organisation, clinic, staff and patient scopes with audit logs.",
+      "Access-controlled storage: organisation, team and user scopes with audit logs.",
       "Model parity: a GPU Triton service had to reproduce the legacy Python pipeline's outputs before it could replace it.",
     ],
     architecture: [
@@ -96,12 +96,12 @@ export const projects: CaseStudy[] = [
         tradeoff: "An extra network hop and a parity-validation effort, for independent scaling and far cleaner API processes.",
       },
       {
-        decision: "Tenancy modelled explicitly (organisation → clinic → staff → patient) with RBAC and audit logs from the start.",
-        tradeoff: "Slower first release, but no retrofit when the B2B product arrived.",
+        decision: "Tenancy modelled explicitly (organisation → team → user) with RBAC and audit logs from the start.",
+        tradeoff: "Slower first release, but no retrofit when a second product line arrived.",
       },
     ],
     outcomes: [
-      "In production serving both the consumer and B2B products.",
+      "In production serving multiple product lines.",
       "Triton service validated at parity with the legacy pipeline and deployed for high-throughput analysis.",
     ],
     lessons: [
@@ -113,8 +113,8 @@ export const projects: CaseStudy[] = [
     xray: {
       requestFlow: [
         "Client uploads one or more images; the ALB routes to a stateless Uvicorn worker.",
-        "Auth resolves the tenant scope (organisation → clinic → staff → patient) from cached Secrets Manager credentials; SlowAPI applies per-key rate limits.",
-        "Images are written to S3 under a PHI-aware key scheme; a submission row is created in Aurora via asyncpg.",
+        "Auth resolves the tenant scope (organisation → team → user) from cached Secrets Manager credentials; SlowAPI applies per-key rate limits.",
+        "Images are written to S3 under a scoped key scheme; a submission row is created in Aurora via asyncpg.",
         "The worker fans out with asyncio.gather: detection and classification go to Triton, the vision LLM call goes out in parallel.",
         "Results are merged into a structured report, persisted, audit-logged, and returned.",
       ],

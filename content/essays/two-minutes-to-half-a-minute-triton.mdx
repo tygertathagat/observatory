@@ -22,7 +22,7 @@ The first step was getting every model out of the application process and onto a
 
 **Compile.** Each detector was compiled to a TensorRT FP16 engine, built on the same GPU type used in production. Some models stayed on ONNX Runtime, where TensorRT handled their operations poorly.
 
-**Batch.** The big change: five separate calls became one. The shared work, such as face detection and landmarks, runs once, and the results fan out to all five pipelines.
+**Batch.** The big change: five separate calls became one. The shared work, such as detection and landmark models, runs once, and the results fan out to all five pipelines.
 
 ## The numbers
 
